@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<methodCall>
+<methodName>getUser</methodName>
+<params>
+<param>
+<value>priyanka</value>
+</param>
+</params>
+</methodCall>
+

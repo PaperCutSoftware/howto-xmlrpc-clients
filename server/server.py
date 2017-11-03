@@ -40,7 +40,8 @@ with SimpleXMLRPCServer(("localhost", 8080),
 
     # Get all the user details for a given user
     def getUserAllDetails(u):
-        return {"user": u, "UUID": userDatabase[u]["UUID"], "status": userDatabase[u]["status"]}
+        if userExist(u):
+            return {"user": u, "UUID": userDatabase[u]["UUID"], "status": userDatabase[u]["status"]}
         # else Fault is returned to client
     server.register_function(getUserAllDetails)
 
