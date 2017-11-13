@@ -13,7 +13,7 @@ The [specification](http://xmlrpc.scripting.com/spec.html) has been around since
 New servers will probably offer remote procedure calls based in more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
-to access an existing server. Here are at PaperCut we are embracing newer
+to access an existing server. Here are at [PaperCut](https://papercut.com) we are embracing newer
 network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
 
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
@@ -104,6 +104,9 @@ in Java it's part of the `xmlRpcExcetion` (which also handles the HTTP exception
 
 I recommend you experiment further with this technique both as learning tool and a
 debugging tool.
+
+I have also included a sample xml payload that shows what happens when you call
+a method with the wrong paramters.
 
 # Using a real programming language.
 
@@ -200,6 +203,23 @@ m4_esyscmd([[sed -e 's/alec/anotherUser/' python3/simpleExample1.py|python3|fold
 I have included the full code to this example (`simpleExample1.py`),
 you can run these various examples to see what happens when things goes wrong.
 To get you started I created a program called `simpleExampleWithErrors1.py`
+
+# Security
+
+XML-RPC has no real security and so
+it's up to the server developer to add additional security measures.
+
+At the very minimum all method calls and responses should be sent via HTTPS.
+However the specific mechanisms will vary depending on the XML-RPC library
+you are using. Please refer to the documentation for the library you are using.
+
+## Client Authentication
+
+As the protocol has no built in security,
+server developers should add additional authentication layers in their methods.
+One technique that we use at PaperCut is
+to require clients to provide a shared secret on each method call. In addition
+all remote clients must have their IP addresses white listed in the server.
 
 # Troubleshooting
 

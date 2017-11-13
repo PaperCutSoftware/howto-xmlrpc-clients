@@ -6,15 +6,17 @@ This is a small repo that contained the supporting material for a recent
 post on the PaperCut Developer blog
 
 
-.
-├── BlogPost.m4 - article spource
+```
+├── BlogPost.html
+├── BlogPost.m4
+├── BlogPost.pdf
 ├── LICENSE
-├── Makefile  -- Build the output. Need pandoc, m4 etc
+├── Makefile
 ├── README.md
-├── go  -- Simple examples in Go lang
+├── go
 │   ├── simpleExample1.go
 │   └── simpleExampleWithErrors1.go
-├── java  -- Simple examples in Java
+├── java
 │   ├── build
 │   │   ├── classes
 │   │   │   └── java
@@ -48,13 +50,15 @@ post on the PaperCut Developer blog
 │               ├── App.java
 │               ├── SimpleExample1.java
 │               └── SimpleExampleWithErrors1.java
-├── python3 -- Simple examples in Python 3, start here
+├── python3
 │   ├── simpleExample1.py
 │   └── simpleExampleWithErrors1.py
-├── server  -- Simple server to run the example clients
+├── server
+│   ├── __pycache__
+│   │   └── server.cpython-36.pyc
 │   └── server.py
-└── xml  -- Real low level XML examples
+└── xml
     ├── simpleExample1.xml
-    └── simpleExample2.xml
-
-20 directories, 30 files
+    ├── simpleExample2.xml
+    └── simpleExample3.xml
+```

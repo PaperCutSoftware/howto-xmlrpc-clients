@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<methodCall>
+<methodName>getUserAllDetails</methodName>
+<params>
+<param>
+  <value><string>alec</string></value>
+</param>
+<param>
+  <value><int>1</int></value>
+</param>
+</params>
+</methodCall>

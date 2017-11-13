@@ -1,5 +1,7 @@
 .SUFFIXES:
 
+.PHONY: clean all tests tests-xml tests-python tests-java tests-go
+
 PANDOC_FLAGS:=--number-sections -s -smart
 
 DOCUMENTCLASS:=article
@@ -21,3 +23,11 @@ clean:
 
 %.html: %.pmd
 	pandoc $(PANDOC_FLAGS) $< -o $@
+
+tests: tests-curl tests-python
+
+tests-xml:
+	server/server.py& find xml -name \*.xml -ls -exec curl -v http://localhost:8080/users --data @{} \; ; kill %1
+
+tests-python:
+	server/server.py& find python3 -name \*.py -ls -exec {} \; ; kill %1
