@@ -6,45 +6,63 @@
 # Provide a "database" lookup from username to user UUID (and status)
 
 userDatabase = {
-        "ahmed": {"UUID": "1111111", "status" : "active" },
-        "jane": {"UUID": "1111112", "status" : "inactive" },
-        "alec": {"UUID": "1111113", "status" : "active" },
+        "ahmed": {"UUID": "1111111", "ativeStatus" : True },
+        "jane":  {"UUID": "1111112", "activeStatus" : False },
+        "alec": {"UUID": "1111113", "activeStatus" : True },
         }
 
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 from xmlrpc.client import Fault
 
-# Restrict to a particular path.
-class RequestHandler(SimpleXMLRPCRequestHandler):
-    rpc_paths = ('/users',)
+def userExists(u):
+    """Does a user exist?"""
+    return (u in userDatabase)
 
-# Create server
-with SimpleXMLRPCServer(("localhost", 8080),
-                        requestHandler=RequestHandler) as server:
-    server.register_introspection_functions()
+def getActiveUserUUID(u):
+    """Get the UUID for given active user"""
+    return getUserUUIDbyState(u, "active")
 
-    # Does a user exist?
-    def userExist(u):
-        if u in userDatabase:
-            return True
-        raise Fault(1 , "userExist(): User {} not found".format(u))
-    server.register_function(userExist)
+def getUserUUIDbyStatus(u, s):
+    """Get the UUID for a given user, any status"""
+    if userExists(u) and userDatabase[u]["activeStatus"] == s:
+        return {"user": u, "UUID": userDatabase[u]["UUID"]}
+    else:
+        raise Fault(1, "No {status} user {user} found".format(status = "active" if s else "inactive", user=u))
 
-    # Get the UUID for a given user
-    def getUserUUID(u):
-        if userExist(u):
-            return {"user": u, "UUID": userDatabase[u]["UUID"]}
-        # else Fault is returned to client
-    server.register_function(getUserUUID)
+def getUserAllDetails(u):
+    """Get all the user details for a given user"""
+    if userExists(u):
+        result = userDatabase[u]
+        result.update({"user": u})
+        return result
+    else:
+        raise Fault(1, "No user {} found".format(u))
 
-    # Get all the user details for a given user
-    def getUserAllDetails(u):
-        if userExist(u):
-            return {"user": u, "UUID": userDatabase[u]["UUID"], "status": userDatabase[u]["status"]}
-        # else Fault is returned to client
-    server.register_function(getUserAllDetails)
+def getAllUsersByStatus(s):
+    """List all the active users"""
+    # NOTE: Normally it's bad practice to return a potentially huge list.
+    result = []
+    for u in userDatabase:
+        if u["activeStatus"] == s:
+            result.append(u)
+    return r
 
-    # Run the server's main loop
-    server.serve_forever()
+if __name__ == "__main__":
+    class RequestHandler(SimpleXMLRPCRequestHandler):
+        rpc_paths = ('/users',)
+
+    # Create server
+    with SimpleXMLRPCServer(("localhost", 8080),
+                requestHandler=RequestHandler) as server:
+
+        server.register_introspection_functions()
+        server.register_function(userExists)
+        server.register_function(getActiveUserUUID)
+        server.register_function(getUserUUIDbyStatus)
+        server.register_function(getUserAllDetails)
+        server.register_function(getAllUsersByStatus)
+
+        # Run the server's main loop
+        server.serve_forever()
 

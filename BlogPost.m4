@@ -6,20 +6,22 @@ m4_changequote([[, ]])
 
 # Introduction
 
-The XML-RPC network protocol is small lightweight network protocol for software clients
-to make function calls to server and receive the results.
+The XML-RPC network protocol is popular, small lightweight, network protocol for
+clients to make function calls to server and receive the results.
 
 The [specification](http://xmlrpc.scripting.com/spec.html) has been around since 1999.
-New servers will probably want to offer remote procedure calls based in more modern
+New servers will probably offer remote procedure calls based in more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
-to access an existing server, and
+to access an existing server. Here are at PaperCut we are embracing newer
+network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
+
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
 
 The XML-RPC model is very simple -- you make a call and you wait to get a single response.
 There is no asynchronous model, no streaming and no security.
 Note that there are some XML-RPC libraries which extend this model,
-but we don't discuss them here.
+but we don't discuss them further.
 
 # How does XML-RPC work?
 
@@ -30,27 +32,28 @@ The xml schema is simple -- refer to the specification for details
 
 2. The HTTP response contains the HTTP status and an xml payload.
 The xml returned is either the data requested or a fault.
-More details on on the data layout below.
+The schema is equally simply and you can find examples below.
 
 # What does this look like?
 
-The easiest way to understand this is to send XML-RPC requests using curl.
+The easiest way to understand this is to send XML-RPC requests using `curl`.  
 You can then see the response details,
 which are often hidden when you program using
 nice helpful libraries to handle the low level specifics.
 
+If you are using Linux or macOS then you already have curl installer,
+otherwise you will need to [install](https://curl.haxx.se/download.html) it for yourself.
+
 If you want to follow on with these examples the code is on
 [GitHub](https://github.com/PaperCutSoftware/howto-xmlrpc-clients)
 
-I've written a very simple XML-RPC server in Python 3 that supports four method calls:
+I've written a very simple XML-RPC server in Python 3 that supports the following method calls:
 
-1. `userExists` -- checks in the "database" (actually just a Python dictionary) to check the username
-2. `getUserUUID`  -- which just returns the unique user identifying string for this user.
-3. `getUserAllDetails`  -- which returns all the details for the given username (the username, the UUID and the status)
+m4_syscmd([[for i in $(sed -nEe '/server.register_function/s/^.+server.register_function\(([^)]+)\)/\1/p' server/server.py) ; do echo '* `'$i'()`' -- $(python3 -c "import server.server;print(server.server.$i.__doc__)");done]])
 
-It's all a bit simplistic, but hopefully enough for us to understand how to write our clients.
+It's all a bit simplistic, but hopefully enough for us to understand how to write clients.
 
-So I can start up the `server.py` program and it will server requests on http://localhost:8080/users.
+So I can start up the `server.py` program and it will serve requests on http://localhost:8080/users.
 
 Once the server is running then we can start to experiment from the command line.
 First create the request payload in a file called `simpleExample1.xml`
@@ -62,7 +65,7 @@ m4_include(xml/simpleExample1.xml)
 
 Now I can run the following command to test the connection
 
-`curl -v http://localhost:8080/users --data @data.xml`
+`curl -v http://localhost:8080/users --data @simpleExample1.xml`
 
 and hopefully get something like this
 
@@ -70,11 +73,14 @@ and hopefully get something like this
 m4_syscmd(curl --stderr - -sv http://localhost:8080/users --data @xml/simpleExample1.xml)
 ```
 
+Notice that this simple example is actually not that simple. The `getUserAllDetails()`
+returns a struct that contains different types (strings and a boolean).
+
 So now you can start to experiment and see whats happens when you get the URL wrong
 (the HTTP status changes), when you send ill formed xml and when you try and call method
 that does not exist.
 I'm not going to go through all these examples here but for instance what happens
-when we ask for the UUID of a non existant user?
+when we ask for the UUID of a non existent user?
 
 If we create another payload file with the following content
 
@@ -90,27 +96,28 @@ m4_syscmd(curl --stderr - -sv http://localhost:8080/users --data @xml/simpleExam
 ```
 
 
-Notice that the HTTP response is still 200, bit the XML payload now contains a \<fault>,
+Notice that the HTTP response is still 200, but the XML payload now contains a \<fault>,
 instead of a \<params>.
 It will depend on the library functions you use as to how the details of this work
-in your client code. For instance in Python the caller gets a `Fault` excepetion, but
-in Java it's part of the xmlRpcExcetion (which also handles the HTTP excepetions)
+in your client code. For instance in Python the caller gets a `Fault` exception, but
+in Java it's part of the `xmlRpcExcetion` (which also handles the HTTP exceptions)
 
 I recommend you experiment further with this technique both as learning tool and a
 debugging tool.
 
 # Using a real programming language.
 
-Working at the xml level is very educational, bit writing shell scripts is not
+Working at the xml level is very educational, but writing shell scripts is not
 a very practical way to write a high performance, robust, client.
 So what tools do you need?
 
 1. Your favourite programming language:
 The good news is that you have lots of choices because XML-RPC is language agnostic.
 The rest if this post will use Python3 to illustrate the concepts,
-but I will upload some equivalent examples in Java and Go programming languages 
+but I have provided some equivalent examples in Java and Go.
 2. An XML-RPC specific library that handles all of the hard work around method names, arguments and responses from the server.
-There are sometimes multiple options for a specific environment so you may need to do some investigation to see what works best in your environment.
+There are sometimes multiple options for a specific environment so you may need to do some investigation to see what works best
+for you.
 
 Here is a list of the libraries that we have used here at PaperCut.
 
@@ -127,16 +134,15 @@ You can find other suggestions on the xml-rpc
 [website](http://www.xmlrpc.com/directory/1568/implementations)
 
 I'll use the same Python server and create a Python client using the xmlrpc.client library.
-Other language exmaples to follow are also provided.
 
-Please note that all this examples are very simplistic and are designed to simply
-illustreaite the basic process of makeing xml-rpc calls and handling the resonses.
+Please note that all this examples are very simplistic and are designed to 
+illustrate the basic process of making xml-rpc calls and handling the responses.
 
-In a producttion code you will probably want to provide an application wrapper to map
-between domain structures or obejcts and the data structures supported by the
-xmlrpc library you are using.
+In production code you will probably want to provide an application wrapper to map
+between domain structures or objects and the data structures supported by the
+xmlrpc library you are using. #TODO Maybe add something to the Go example.
 
-So straight away the xmlrpc library gives us a lot convicence.
+So straight away the xmlrpc library gives us a lot of convenience.
 
 1. No need to generate or parse xml payloads. We just use native Python data structures.
 2. We can handle errors using the native exception handling in Python
@@ -163,14 +169,33 @@ has happened on the network yet, we've just set up a data structure.
 Let's actually try and make a procedure call across the network
 
 ```python
-m4_esyscmd([[sed -ne '/try:/,$p' python3/simpleExample1.py]])
+m4_esyscmd([[sed -ne '/getUserAllDetails/,+3p' python3/simpleExample1.py]])
 ```
 
 Straight away we are working at a much higher level.
 
 * We are not handling raw xml
 * Information is stored in native Python data structures
-* We can use standard Python exception mechanisms to manage any errors
+
+However tihngs can go wrong and we we can use standard Python exception mechanisms to manage any errors.
+
+A more complete version of the above example would be
+
+```python
+m4_esyscmd([[sed -ne '/try:/,$p' python3/simpleExample1.py]])
+```
+
+and when we run it we get the following output
+
+```
+m4_esyscmd([[python3/simpleExample1.py]])
+```
+
+By contrast if we get the user name wrong for instance we get an exception.
+
+```
+m4_esyscmd([[sed -e 's/alec/anotherUser/' python3/simpleExample1.py|python3|fold -w 60]])
+```
 
 I have included the full code to this example (`simpleExample1.py`),
 you can run these various examples to see what happens when things goes wrong.
