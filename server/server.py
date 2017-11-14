@@ -6,7 +6,7 @@
 # Provide a "database" lookup from username to user UUID (and status)
 
 userDatabase = {
-        "ahmed": {"UUID": "1111111", "ativeStatus" : True },
+        "ahmed": {"UUID": "1111111", "activeStatus" : True },
         "jane":  {"UUID": "1111112", "activeStatus" : False },
         "alec": {"UUID": "1111113", "activeStatus" : True },
         }
@@ -43,10 +43,15 @@ def getAllUsersByStatus(s):
     """List all the active users"""
     # NOTE: Normally it's bad practice to return a potentially huge list.
     result = []
-    for u in userDatabase:
-        if u["activeStatus"] == s:
-            result.append(u)
-    return r
+    for user, info in userDatabase.items():
+        if info["activeStatus"] == s:
+            info.update({"user": user})
+            result.append(info)
+
+    if len(result) == 0:
+        raise Fault(2, "No users found with active status of {}".format(s))
+
+    return result
 
 if __name__ == "__main__":
     class RequestHandler(SimpleXMLRPCRequestHandler):
