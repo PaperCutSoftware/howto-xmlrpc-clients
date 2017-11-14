@@ -40,7 +40,7 @@ def getUserAllDetails(u):
         raise Fault(1, "No user {} found".format(u))
 
 def getAllUsersByStatus(s):
-    """List all the active users"""
+    """List all the users, filtered by their active status"""
     # NOTE: Normally it's bad practice to return a potentially huge list.
     result = []
     for user, info in userDatabase.items():
