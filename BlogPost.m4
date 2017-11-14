@@ -18,6 +18,8 @@ Here are at [PaperCut](https://papercut.com) we are embracing newer
 network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
 
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
+Of prticualr interest to XML-RPC novices will be using curl to see the raw xml
+in the function calls, and the toubleshooting tips at the end.
 
 The XML-RPC model is very simple -- you make a call and you wait to get a single response.
 There is no asynchronous model, no streaming and no security.
@@ -135,7 +137,7 @@ Here is a list of the libraries that we have used here at PaperCut.
 | Perl    | RPC::XML::Client|
 
 You can find other suggestions on the xml-rpc
-[website](http://www.xmlrpc.com/directory/1568/implementations)
+[website](http://www.xmlrpc.com/directory/1568/implementations).
 
 I'll use the same Python server and create a Python client using the `xmlrpc.client` library.
 
@@ -165,7 +167,7 @@ no connection is started with the server.
 
 So now you can start to explore how to use code to call your XML-RPC server.
 
-So in Python
+So in Python:
 
 ```python
 m4_esyscmd([[sed -ne '/import xmlrpc.client/,/proxy/p' python3/simpleExample1.py]])
@@ -174,7 +176,7 @@ m4_esyscmd([[sed -ne '/import xmlrpc.client/,/proxy/p' python3/simpleExample1.py
 Now we have a proxy object "connected" to the correct URL. But remember nothing
 has happened on the network yet, we've just set up a data structure.
 
-Let's actually try and make a procedure call across the network
+Let's actually try and make a procedure call across the network:
 
 ```python
 m4_esyscmd([[sed -ne '/getUserAllDetails/,+3p' python3/simpleExample1.py]])
@@ -253,7 +255,9 @@ with a type mismatch.
 
 If you have checked all the above then I find the most productive approach
 is to use curl to send the XML request I _think_ my code is sending.
-This is same technique as I used at the start of the post.
+This is the approach as I showed at the start of the post and
+I used this technique to debug some problems with the test server
+I wrote for this article.
 
 If it succeeds then there is a bug in my client and if the call fails
 then I've made an incorrect assumption about how the server works.
