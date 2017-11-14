@@ -30,8 +30,8 @@ public class SimpleExample1 {
 
         try {
           Object[] params = new Object[]{testUser};
-          boolean res = (boolean) proxy.execute("userExist",params);
-          System.out.println("Called userExists for user " + testUser + ": Result is  " + res);
+          boolean res = (boolean) proxy.execute("userExists",params);
+          System.out.println("Called userExistss for user " + testUser + ": Result is  " + res);
         } catch (XmlRpcException ex) {
 
           System.out.println("Caught XML RPC Exception " + ex.getMessage());

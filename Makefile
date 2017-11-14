@@ -33,7 +33,7 @@ tests-python:
 	server/server.py& find python3 -name \*.py -ls -exec {} \; ; kill %1
 
 tests-java:
-	server/server.py& cd java && for i in *.build.gradle ; do gradle -b $$i run;done; kill %1
+	server/server.py& cd java && for i in *.build.gradle ; do ./gradlew -b $$i run;done; kill %1
 
 tests-go:
 	go get github.com/divan/gorilla-xmlrpc/xml
