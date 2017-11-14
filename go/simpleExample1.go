@@ -24,7 +24,7 @@ func main() {
 		testUser,
 	}
 
-	buf, _ := xml.EncodeClientRequest("userExist", args)
+	buf, _ := xml.EncodeClientRequest("userExists", args)
 	response, err := http.Post("http://"+host+":"+port+"/users", "text/xml", bytes.NewBuffer(buf))
 
 	if err != nil {
@@ -44,9 +44,8 @@ func main() {
 	var reply struct{ Present bool } // Magic data strcuture
 	err = xml.DecodeClientResponse(response.Body, &reply)
 	if err != nil {
-		fmt.Printf("Error %v\n", err)
+		fmt.Printf("Error on functions userExists(\"%v\") returns %v\n", testUser, err)
 		return
 	}
-
-	fmt.Printf("Return data is %v\n", reply.Present)
+	fmt.Printf("Return on functions userExists(\"%v\") data is %v\n", testUser, reply.Present)
 }

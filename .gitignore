@@ -1,2 +1,5 @@
 __pycache__
 BlogPost.html
+java/build/
+java/.gradle/
+*.pyc

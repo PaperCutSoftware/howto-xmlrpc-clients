@@ -13,7 +13,8 @@ The [specification](http://xmlrpc.scripting.com/spec.html) has been around since
 New servers will probably offer remote procedure calls based in more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
-to access an existing server. Here are at [PaperCut](https://papercut.com) we are embracing newer
+to access an existing server.
+Here are at [PaperCut](https://papercut.com) we are embracing newer
 network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
 
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
@@ -23,7 +24,7 @@ There is no asynchronous model, no streaming and no security.
 Note that there are some XML-RPC libraries which extend this model,
 but we don't discuss them further.
 
-# How does XML-RPC work?
+# How does XML-RPC work technically?
 
 That question is best answered by reading the specification. But the short answer is
 
@@ -36,12 +37,12 @@ The schema is equally simply and you can find examples below.
 
 # What does this look like?
 
-The easiest way to understand this is to send XML-RPC requests using `curl`.  
+The easiest way to understand this is to send XML-RPC requests using `curl`.
 You can then see the response details,
 which are often hidden when you program using
-nice helpful libraries to handle the low level specifics.
+nice helpful libraries that handle the low level specifics.
 
-If you are using Linux or macOS then you already have curl installer,
+If you are using Linux or macOS then you already have curl installed,
 otherwise you will need to [install](https://curl.haxx.se/download.html) it for yourself.
 
 If you want to follow on with these examples the code is on
@@ -136,10 +137,10 @@ Here is a list of the libraries that we have used here at PaperCut.
 You can find other suggestions on the xml-rpc
 [website](http://www.xmlrpc.com/directory/1568/implementations)
 
-I'll use the same Python server and create a Python client using the xmlrpc.client library.
+I'll use the same Python server and create a Python client using the `xmlrpc.client` library.
 
 Please note that all this examples are very simplistic and are designed to 
-illustrate the basic process of making xml-rpc calls and handling the responses.
+illustrate the basic process of making XML-RPC calls and handling the responses.
 
 In production code you will probably want to provide an application wrapper to map
 between domain structures or objects and the data structures supported by the
