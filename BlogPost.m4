@@ -144,7 +144,11 @@ illustrate the basic process of making XML-RPC calls and handling the responses.
 
 In production code you will probably want to provide an application wrapper to map
 between domain structures or objects and the data structures supported by the
-xmlrpc library you are using. #TODO Maybe add something to the Go example.
+xmlrpc library you are using.
+
+(for example of this approach wrapper approrach please see the
+[complex](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/go/complexExampleWithProxy.go)
+Go example)
 
 So straight away the xmlrpc library gives us a lot of convenience.
 
