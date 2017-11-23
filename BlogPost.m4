@@ -6,11 +6,11 @@ m4_changequote([[, ]])
 
 # Introduction
 
-The XML-RPC network protocol is a popular, small lightweight, network protocol for
+The XML-RPC network protocol is a popular, small, lightweight, network protocol for
 clients to make function calls to a server and receive the results.
 
 The [specification](http://XMLrpc.scripting.com/spec.html) has been around since 1999.
-New servers will probably offer remote procedure calls based in more modern
+Recently developed servers will probably offer remote procedure calls based in more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
 to access an existing server.
@@ -21,9 +21,12 @@ I hope these notes will be useful enough to get you started if you have never us
 Of particular interest to XML-RPC novices will be using curl to see the raw XML
 in the function calls, and the troubleshooting tips at the end.
 
+I'd love to get your feedback, especially if you notice something that needs
+fixing. Please leave a comment below.
+
 The XML-RPC model is very simple -- you make a call and you wait to get a single response.
 There is no asynchronous model, no streaming and no security.
-Note that there are some XML-RPC libraries which extend this model,
+Note that some XML-RPC libraries extend this model,
 but we don't discuss them further.
 
 # How does XML-RPC work technically?
@@ -32,14 +35,14 @@ That question is best answered by reading the specification. But the short answe
 
 ![The XML-RPC call sequence](diagram.png)
 
-1. The client sends an XML document, using a HTTP(S) POST request, to the server.
-The XML schema is simple -- refer to the specification for details
-
+1. The client sends an XML document, using an HTTP(S) POST request, to the server.
 <!-- end of list -->
 
 4. HTTP status and an XML payload containing return values *OR*
 5. HTTP status and a fault, also delivered in an XML document. 
-The schema is equally simply and you can find examples below.
+<!-- end of list -->
+
+The XML schema sued is simple -- refer to the specification for details.
 
 # What does this look like?
 
@@ -49,22 +52,23 @@ You can then see the response details,
 which are often hidden when you program using
 nice helpful libraries that handle the low level specifics.
 
-If you are using Linux or macOS then you already have curl installed,
+If you are using Linux or macOS then you probably already have curl installed,
 otherwise you will need to [install](https://curl.haxx.se/download.html) it for yourself.
 
 If you want to follow on with these examples the code is on
 [GitHub](https://github.com/PaperCutSoftware/howto-xmlrpc-clients)
 
+In order to make these examples concrete,
 I've written a very simple XML-RPC server in Python 3 that supports the following method calls:
 
 m4_syscmd([[for i in $(sed -nEe '/server.register_function/s/^.+server.register_function\(([^)]+)\)/\1/p' server/server.py) ; do echo '* `'$i'()`' -- $(python3 -c "import server.server;print(server.server.$i.__doc__)");done]])
 
 It's all a bit simplistic, but hopefully enough for us to understand how to write clients.
 
-So I can start up the `server.py` program and it will serve requests on http://localhost:8080/users.
+So you can start up the `server/server.py` program and it will serve requests on http://localhost:8080/users.
 
 Once the server is running then we can start to experiment from the command line.
-First create the request payload in a file called `simpleExample1.xml`
+First create the request payload in a file called [`simpleExample1.xml`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/xml/simpleExample1.xml)
 (it can be called anything, this is just the name I am using).
 
 ```xml
@@ -74,6 +78,8 @@ m4_include(xml/simpleExample1.xml)
 Now I can run the following command to test the connection
 
 `curl -v http://localhost:8080/users --data @simpleExample1.xml`
+
+(note: don't forget the _`@`_)
 
 and hopefully get something like this
 
@@ -96,7 +102,6 @@ If we create another payload file with the following content
 m4_include(xml/simpleExample2.xml)
 
 ```
-To understand the specifics of the various XML elements refer to the XML-RPC specification.
 
 The response from the server is 
 
@@ -104,13 +109,13 @@ The response from the server is
 m4_syscmd(curl --stderr - -sv http://localhost:8080/users --data @xml/simpleExample2.xml)
 ```
 
-Notice that the HTTP response is still 200, but the XML payload now contains a \<fault> element,
-instead of a \<params> element.
+Notice that the HTTP response is still 200, but the XML payload now contains a `<fault>` element,
+instead of a `<params>` element.
 It will depend on the library functions you use as to how the details of this work
 in your client code. For instance in Python the caller gets a `Fault` exception, but
-in Java it's part of the `xmlRpcExcetion` (which also handles the HTTP exceptions)
+in Java it's part of the `xmlRpcExcption` (which also handles the HTTP exceptions)
 
-I recommend you experiment further with this technique both as learning tool and a
+I recommend you experiment further with this technique both as learning _and_ a
 debugging tool.
 
 I have also included a sample XML payload that shows what happens when you call
@@ -188,9 +193,9 @@ Straight away we are working at a much higher level.
 * We are not handling raw XML
 * Information is stored in native Python data structures
 
-However tihngs can go wrong and we we can use standard Python exception mechanisms to manage any errors.
+However things can go wrong and we we can use standard Python exception mechanisms to manage any errors.
 
-A more complete version of the above example would be
+A complete version of the above example would be
 
 ```python
 m4_esyscmd([[sed -ne '/try:/,$p' python3/simpleExample1.py]])
@@ -208,17 +213,17 @@ By contrast if we get the user name wrong for instance we get an exception.
 m4_esyscmd([[sed -e 's/alec/anotherUser/' python3/simpleExample1.py|python3|fold -w 60]])
 ```
 
-I have included the full code to this example (`simpleExample1.py`),
+I have included the full code to this example ([`simpleExample1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExample1.py)),
 you can run these various examples to see what happens when things goes wrong.
-To get you started I created a program called `simpleExampleWithErrors1.py`
+To get you started I created a program called [`simpleExampleWithErrors1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExampleWithErrors1.py)
 
 # Security
 
-XML-RPC provides no security security mechanisms and so
+XML-RPC provides no security mechanisms and so
 it's up to the server developer to provide security for client requests.
 
 At the very minimum all method calls and responses should be sent via HTTPS.
-However the specific HTTPS mechanisms will vary depending on the XML-RPC library
+However the mechanics of using HTTPS will vary depending on the XML-RPC library
 you are using. Please refer to the documentation for the appropriate library.
 
 Additional security options include:
@@ -228,14 +233,6 @@ Additional security options include:
 3. username/password authentication (can also be used with JWT and shared secret)
 4. Shared secret, provided via an additional method parameter. This is the approach
 used by PaperCut as it easy for client developers to use.
-
-## Client Authentication
-
-As the protocol has no built in security,
-server developers should add additional authentication layers in their methods.
-One technique that we use at PaperCut is
-to require clients to provide a shared secret on each method call. In addition
-all remote clients must have their IP addresses white listed in the server.
 
 # Troubleshooting
 
@@ -251,7 +248,7 @@ Things to check are:
 4. Does the server code have some additional security requirement you have not satisfied? (e.g. passing additional security parameters)
 5. Are you using the correct method name?
 6. Do you have the correct number of parameters?
-7. Is each parameter of the correct type.
+7. Is each parameter of the correct type?
 
 ## Passing the correct parameter type
 
