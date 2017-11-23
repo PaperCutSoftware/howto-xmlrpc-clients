@@ -14,8 +14,8 @@ DOCUMENTCLASS := article
 IMAGES=diagram.png
 
 pdf: $(PROJECT).pdf # Default
-
 html: $(PROJECT).html
+pmd: $(PROJECT).pmd
 
 all: pdf html
 
