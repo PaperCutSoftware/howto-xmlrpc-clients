@@ -20,7 +20,7 @@ pmd: $(PROJECT).pmd
 all: pdf html
 
 clean:
-	@-rm -vf $(PROJECT).{pdf,html,pmd}
+	@-rm -vf $(PROJECT).{pdf,html,pmd} diagram.png
 
 %.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(lastword $(MAKEFILE_LIST)) $(IMAGES)
 
