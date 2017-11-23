@@ -1,30 +1,33 @@
 .SUFFIXES:
 
-.PHONY: clean all tests tests-xml tests-python tests-java tests-go wc
+.PHONY: clean all tests tests-xml tests-python tests-java tests-go wc pdf html plain pmd
 
 # Clean up old server instances
 KILLSERVER:=ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/sh"}'
 
-PROJECT := BlogPost
+PROJECT:=BlogPost
 
-PANDOC_FLAGS :=--number-sections -s -smart -f markdown+startnum
+PANDOC_FLAGS:=--number-sections -s -smart -f markdown+startnum
 
-DOCUMENTCLASS := article
+THISMAKEFILE:=$(lastword $(MAKEFILE_LIST))
 
-IMAGES=diagram.png
+DOCUMENTCLASS:=article
 
-pdf: $(PROJECT).pdf # Default
+IMAGES:=diagram.png
+
+pdf: $(PROJECT).pdf # Default target
+all: pdf html
+
 html: $(PROJECT).html
 pmd: $(PROJECT).pmd
-
-all: pdf html
+plain: $(PROJECT).txt
 
 clean:
 	@-rm -vf $(PROJECT).{pdf,html,pmd} diagram.png
 
-%.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(lastword $(MAKEFILE_LIST)) $(IMAGES)
+%.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(THISMAKEFILE)
 
-%.pmd: %.m4
+%.pmd: %.m4 $(THISMAKEFILE)
 	$(KILLSERVER)
 	server/server.py & \
 	m4 -P $< > $@ ; \
@@ -36,10 +39,13 @@ clean:
 wc: $(PROJECT).pmd
 	@echo Word count: $$(pandoc $(PANDOC_FLAGS) -t plain  $< | wc -w)
 
-%.pdf: %.pmd
+%.txt: %.pmd $(THISMAKEFILE)
+	pandoc $(PANDOC_FLAGS) -t plain $< -o $@
+
+%.pdf: %.pmd $(IMAGES) $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) -V documentclass=$(DOCUMENTCLASS) --toc $< -o $@
 
-%.html: %.pmd
+%.html: %.pmd $(IMAGES) $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) $< -o $@
 
 tests: tests-xml tests-python tests-java tests-go

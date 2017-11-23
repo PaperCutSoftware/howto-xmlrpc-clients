@@ -1,5 +1,6 @@
 __pycache__
 BlogPost.html
+BlogPost.txt
 *.pmd
 java/build/
 java/.gradle/
