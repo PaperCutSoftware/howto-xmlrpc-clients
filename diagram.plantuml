@@ -1,0 +1,32 @@
+@startuml
+
+collections Clients
+participant Server
+database Database
+
+autonumber "<b>"
+
+activate Clients
+Clients -> Server: HTTP(S) POST request with XML payload
+note left
+  method name and
+  parameter values
+end note
+
+activate Server
+Server --> Database: Query
+Server <-- Database: Data
+
+alt Success
+  Clients <- Server: HTTP(S) response with XML ""<params>"" element
+
+else Failure
+  Clients <- Server: HTTP(S) response with XML ""<fault>"" element
+end
+
+deactivate Server
+
+deactivate Clients
+
+@enduml
+

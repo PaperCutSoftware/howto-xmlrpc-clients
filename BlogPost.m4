@@ -1,4 +1,4 @@
-% How to write xml-rpc clients
+% How to write XML-rpc clients
 % Alec Clews
 % November 2017
 
@@ -6,10 +6,10 @@ m4_changequote([[, ]])
 
 # Introduction
 
-The XML-RPC network protocol is popular, small lightweight, network protocol for
-clients to make function calls to server and receive the results.
+The XML-RPC network protocol is a popular, small lightweight, network protocol for
+clients to make function calls to a server and receive the results.
 
-The [specification](http://xmlrpc.scripting.com/spec.html) has been around since 1999.
+The [specification](http://XMLrpc.scripting.com/spec.html) has been around since 1999.
 New servers will probably offer remote procedure calls based in more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
@@ -18,8 +18,8 @@ Here are at [PaperCut](https://papercut.com) we are embracing newer
 network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
 
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
-Of prticualr interest to XML-RPC novices will be using curl to see the raw xml
-in the function calls, and the toubleshooting tips at the end.
+Of particular interest to XML-RPC novices will be using curl to see the raw XML
+in the function calls, and the troubleshooting tips at the end.
 
 The XML-RPC model is very simple -- you make a call and you wait to get a single response.
 There is no asynchronous model, no streaming and no security.
@@ -30,16 +30,21 @@ but we don't discuss them further.
 
 That question is best answered by reading the specification. But the short answer is
 
-1. The client sends an xml document, using a HTTP(S) POST request, to the server.
-The xml schema is simple -- refer to the specification for details
+![The XML-RPC call sequence](diagram.png)
 
-2. The HTTP response contains the HTTP status and an xml payload.
-The xml returned is either the data requested or a fault.
+1. The client sends an XML document, using a HTTP(S) POST request, to the server.
+The XML schema is simple -- refer to the specification for details
+
+<!-- end of list -->
+
+4. HTTP status and an XML payload containing return values *OR*
+5. HTTP status and a fault, also delivered in an XML document. 
 The schema is equally simply and you can find examples below.
 
 # What does this look like?
 
-The easiest way to understand this is to send XML-RPC requests using `curl`.
+The easiest way to understand this is to send XML-RPC requests using `curl`
+on the command line.
 You can then see the response details,
 which are often hidden when you program using
 nice helpful libraries that handle the low level specifics.
@@ -80,7 +85,7 @@ Notice that this simple example is actually not that simple. The `getUserAllDeta
 returns a struct that contains different types (strings and a boolean).
 
 So now you can start to experiment and see whats happens when you get the URL wrong
-(the HTTP status changes), when you send ill formed xml and when you try and call method
+(the HTTP status changes), when you send ill formed XML and when you try and call method
 that does not exist.
 I'm not going to go through all these examples here but for instance what happens
 when we ask for the UUID of a non existent user?
@@ -91,6 +96,7 @@ If we create another payload file with the following content
 m4_include(xml/simpleExample2.xml)
 
 ```
+To understand the specifics of the various XML elements refer to the XML-RPC specification.
 
 The response from the server is 
 
@@ -98,9 +104,8 @@ The response from the server is
 m4_syscmd(curl --stderr - -sv http://localhost:8080/users --data @xml/simpleExample2.xml)
 ```
 
-
-Notice that the HTTP response is still 200, but the XML payload now contains a \<fault>,
-instead of a \<params>.
+Notice that the HTTP response is still 200, but the XML payload now contains a \<fault> element,
+instead of a \<params> element.
 It will depend on the library functions you use as to how the details of this work
 in your client code. For instance in Python the caller gets a `Fault` exception, but
 in Java it's part of the `xmlRpcExcetion` (which also handles the HTTP exceptions)
@@ -108,19 +113,21 @@ in Java it's part of the `xmlRpcExcetion` (which also handles the HTTP exception
 I recommend you experiment further with this technique both as learning tool and a
 debugging tool.
 
-I have also included a sample xml payload that shows what happens when you call
+I have also included a sample XML payload that shows what happens when you call
 a method with the wrong paramters.
 
 # Using a real programming language.
 
-Working at the xml level is very educational, but writing shell scripts is not
+Working at the XML level is very educational, but writing shell scripts is not
 a very practical way to write a high performance, robust, client.
 So what tools do you need?
 
 1. Your favourite programming language:
 The good news is that you have lots of choices because XML-RPC is language agnostic.
 The rest if this post will use Python3 to illustrate the concepts,
-but I have provided some equivalent examples in Java and Go.
+but I have provided some equivalent examples in
+[Java](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/java) and
+[Go](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/go).
 2. An XML-RPC specific library that handles all of the hard work around method names, arguments and responses from the server.
 There are sometimes multiple options for a specific environment so you may need to do some investigation to see what works best
 for you.
@@ -136,7 +143,7 @@ Here is a list of the libraries that we have used here at PaperCut.
 | Python2 | xmlrpclib|
 | Perl    | RPC::XML::Client|
 
-You can find other suggestions on the xml-rpc
+You can find other suggestions on the XML-RPC
 [website](http://www.xmlrpc.com/directory/1568/implementations).
 
 I'll use the same Python server and create a Python client using the `xmlrpc.client` library.
@@ -146,17 +153,11 @@ illustrate the basic process of making XML-RPC calls and handling the responses.
 
 In production code you will probably want to provide an application wrapper to map
 between domain structures or objects and the data structures supported by the
-xmlrpc library you are using.
+XML-RPC library you are using.
 
-(for example of this approach wrapper approrach please see the
+(for example of this wrapper approach please see the
 [complex](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/go/complexExampleWithProxy.go)
 Go example)
-
-So straight away the xmlrpc library gives us a lot of convenience.
-
-1. No need to generate or parse xml payloads. We just use native Python data structures.
-2. We can handle errors using the native exception handling in Python
-
 
 Most XML-RPC libraries work in a similar fashion
 
@@ -184,7 +185,7 @@ m4_esyscmd([[sed -ne '/getUserAllDetails/,+3p' python3/simpleExample1.py]])
 
 Straight away we are working at a much higher level.
 
-* We are not handling raw xml
+* We are not handling raw XML
 * Information is stored in native Python data structures
 
 However tihngs can go wrong and we we can use standard Python exception mechanisms to manage any errors.
@@ -213,12 +214,20 @@ To get you started I created a program called `simpleExampleWithErrors1.py`
 
 # Security
 
-XML-RPC has no real security and so
-it's up to the server developer to add additional security measures.
+XML-RPC provides no security security mechanisms and so
+it's up to the server developer to provide security for client requests.
 
 At the very minimum all method calls and responses should be sent via HTTPS.
-However the specific mechanisms will vary depending on the XML-RPC library
-you are using. Please refer to the documentation for the library you are using.
+However the specific HTTPS mechanisms will vary depending on the XML-RPC library
+you are using. Please refer to the documentation for the appropriate library.
+
+Additional security options include:
+
+1. [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security)
+2. [JWT](https://jwt.io/)
+3. username/password authentication (can also be used with JWT and shared secret)
+4. Shared secret, provided via an additional method parameter. This is the approach
+used by PaperCut as it easy for client developers to use.
 
 ## Client Authentication
 

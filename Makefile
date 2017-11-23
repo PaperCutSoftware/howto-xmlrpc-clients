@@ -1,25 +1,43 @@
 .SUFFIXES:
 
-.PHONY: clean all tests tests-xml tests-python tests-java tests-go
+.PHONY: clean all tests tests-xml tests-python tests-java tests-go wc
 
-PANDOC_FLAGS:=--number-sections -s -smart
+# Clean up old server instances
+KILLSERVER:=ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/sh"}'
 
-DOCUMENTCLASS:=article
+PROJECT := BlogPost
 
-all: BlogPost.pdf
+PANDOC_FLAGS :=--number-sections -s -smart -f markdown+startnum
 
-BlogPost.pdf: server/server.py ${glob xml/*.xml} python3/simpleExample1.py  $(lastword $(MAKEFILE_LIST))
+DOCUMENTCLASS := article
+
+IMAGES=diagram.png
+
+pdf: $(PROJECT).pdf # Default
+
+html: $(PROJECT).html
+
+all: pdf html
 
 clean:
-	-rm -f BlogPost.pdf BlogPost.html 
+	@-rm -vf $(PROJECT).{pdf,html,pmd}
+
+%.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(lastword $(MAKEFILE_LIST)) $(IMAGES)
 
 %.pmd: %.m4
-	server/server.py&
-	m4 -P $< > $@
-	ps -u $(USER) | awk '/python.+server\.py/ { print $$2}'|xargs kill
+	$(KILLSERVER)
+	server/server.py & \
+	m4 -P $< > $@ ; \
+	kill %1
+
+%.png: %.plantuml
+	plantuml -tpng $<
+
+wc: $(PROJECT).pmd
+	@echo Word count: $$(pandoc $(PANDOC_FLAGS) -t plain  $< | wc -w)
 
 %.pdf: %.pmd
-	pandoc $(PANDOC_FLAGS) -V documentclass=$(DOCUMENTCLASS) --toc -t latex  $< -o $@
+	pandoc $(PANDOC_FLAGS) -V documentclass=$(DOCUMENTCLASS) --toc $< -o $@
 
 %.html: %.pmd
 	pandoc $(PANDOC_FLAGS) $< -o $@
@@ -27,15 +45,19 @@ clean:
 tests: tests-xml tests-python tests-java tests-go
 
 tests-xml:
-	server/server.py& find xml -name \*.xml -ls -exec curl -v http://localhost:8080/users --data @{} \; ; kill %1
+	$(KILLSERVER)
+	server/server.py & find xml -name \*.xml -ls -exec curl -v http://localhost:8080/users --data @{} \; ; kill %1
 
 tests-python:
-	server/server.py& find python3 -name \*.py -ls -exec {} \; ; kill %1
+	$(KILLSERVER)
+	server/server.py & find python3 -name \*.py -ls -exec {} \; ; kill %1
 
 tests-java:
-	server/server.py& cd java && for i in *.build.gradle ; do ./gradlew -b $$i run;done; kill %1
+	$(KILLSERVER)
+	server/server.py & cd java && for i in *.build.gradle ; do ./gradlew -b $$i run;done; kill %1
 
 tests-go:
+	$(KILLSERVER)
 	go get github.com/divan/gorilla-xmlrpc/xml
-	server/server.py& find go -name \*.go -ls -exec go run {} \; ;kill %1
+	server/server.py & find go -name \*.go -ls -exec go run {} \; ;kill %1
 
