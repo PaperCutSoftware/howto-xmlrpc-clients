@@ -21,9 +21,10 @@ all: pdf html
 html: $(PROJECT).html
 pmd: $(PROJECT).pmd
 plain: $(PROJECT).txt
+word: $(PROJECT).docx
 
 clean:
-	@-rm -vf $(PROJECT).{pdf,html,pmd} diagram.png
+	@-rm -vf $(PROJECT).{pdf,html,pmd,docx} diagram.png
 
 %.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(THISMAKEFILE)
 
@@ -38,6 +39,9 @@ clean:
 
 wc: $(PROJECT).pmd
 	@echo Word count: $$(pandoc $(PANDOC_FLAGS) -t plain  $< | wc -w)
+
+%.docx: %.pmd $(IMAGES) $(THISMAKEFILE)
+	pandoc $(PANDOC_FLAGS) $< -o $@
 
 %.txt: %.pmd $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) -t plain $< -o $@
