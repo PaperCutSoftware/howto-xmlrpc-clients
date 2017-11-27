@@ -12,10 +12,12 @@ note left
   method name and
   parameter values
 end note
+autonumber stop
 
 activate Server
 Server --> Database: Query
 Server <-- Database: Data
+autonumber resume
 
 alt Success
   Clients <- Server: HTTP(S) response with XML ""<params>"" element

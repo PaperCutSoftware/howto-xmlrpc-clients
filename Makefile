@@ -7,7 +7,7 @@ KILLSERVER:=ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/s
 
 PROJECT:=BlogPost
 
-PANDOC_FLAGS:=--number-sections -s -smart -f markdown+startnum
+PANDOC_FLAGS:=--number-sections -s -f markdown+startnum+smart
 
 THISMAKEFILE:=$(lastword $(MAKEFILE_LIST))
 
@@ -41,7 +41,7 @@ wc: $(PROJECT).pmd
 	@echo Word count: $$(pandoc $(PANDOC_FLAGS) -t plain  $< | wc -w)
 
 %.docx: %.pmd $(IMAGES) $(THISMAKEFILE)
-	pandoc $(PANDOC_FLAGS) $< -o $@
+	/usr/local/bin/pandoc $(PANDOC_FLAGS) $< -o $@
 
 %.txt: %.pmd $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) -t plain $< -o $@

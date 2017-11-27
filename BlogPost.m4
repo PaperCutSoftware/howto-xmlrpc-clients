@@ -42,7 +42,7 @@ That question is best answered by reading the specification. But the short answe
 5. HTTP status and a fault, also delivered in an XML document. 
 <!-- end of list -->
 
-The XML schema sued is simple -- refer to the specification for details.
+The XML schema used is simple -- refer to the specification for details.
 
 # What does this look like?
 
@@ -79,7 +79,7 @@ Now I can run the following command to test the connection
 
 `curl -v http://localhost:8080/users --data @simpleExample1.xml`
 
-(note: don't forget the _`@`_)
+(note: don't forget the "**`@`**" )
 
 and hopefully get something like this
 
@@ -113,7 +113,8 @@ Notice that the HTTP response is still 200, but the XML payload now contains a `
 instead of a `<params>` element.
 It will depend on the library functions you use as to how the details of this work
 in your client code. For instance in Python the caller gets a `Fault` exception, but
-in Java it's part of the `xmlRpcExcption` (which also handles the HTTP exceptions)
+in Java it's part of the `xmlRpcExcption` (which also handles the HTTP exceptions).
+I have included examples of error handling in some of the samples on GitHub.
 
 I recommend you experiment further with this technique both as learning _and_ a
 debugging tool.
@@ -160,9 +161,9 @@ In production code you will probably want to provide an application wrapper to m
 between domain structures or objects and the data structures supported by the
 XML-RPC library you are using.
 
-(for example of this wrapper approach please see the
+For an example of this wrapper approach please see the
 [complex](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/go/complexExampleWithProxy.go)
-Go example)
+Go example.
 
 Most XML-RPC libraries work in a similar fashion
 
@@ -185,7 +186,7 @@ has happened on the network yet, we've just set up a data structure.
 Let's actually try and make a procedure call across the network:
 
 ```python
-m4_esyscmd([[sed -ne '/getUserAllDetails/,+3p' python3/simpleExample1.py]])
+m4_esyscmd([[sed -ne '/getUserAllDetails/,+4p' python3/simpleExample1.py]])
 ```
 
 Straight away we are working at a much higher level.
@@ -213,9 +214,11 @@ By contrast if we get the user name wrong for instance we get an exception.
 m4_esyscmd([[sed -e 's/alec/anotherUser/' python3/simpleExample1.py|python3|fold -w 60]])
 ```
 
-I have included the full code to this example ([`simpleExample1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExample1.py)),
-you can run these various examples to see what happens when things goes wrong.
-To get you started I created a program called [`simpleExampleWithErrors1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExampleWithErrors1.py)
+I have included the full code to this example
+([`simpleExample1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExample1.py))
+and another more complex example
+([`simpleExampleWithErrors1.py`](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/python3/simpleExampleWithErrors1.py))
+to show what happens when things goes wrong.
 
 # Security
 
@@ -230,9 +233,9 @@ Additional security options include:
 
 1. [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security)
 2. [JWT](https://jwt.io/)
-3. username/password authentication (can also be used with JWT and shared secret)
-4. Shared secret, provided via an additional method parameter. This is the approach
-used by PaperCut as it easy for client developers to use.
+3. Shared secret, provided via an additional method parameter. This is the approach
+used by PaperCut as it is easy for client developers to use.
+4. username/password authentication. This can also be used with JWT or shared secret.
 
 # Troubleshooting
 
