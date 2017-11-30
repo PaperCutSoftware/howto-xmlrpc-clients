@@ -6,25 +6,26 @@ m4_changequote([[, ]])
 
 # Introduction
 
-The XML-RPC network protocol is a popular, small, lightweight, network protocol for
-clients to make function calls to a server and receive the results.
+The XML-RPC network protocol is popular, small, and lightweight. Designed for
+clients to make function calls to a server and receive the results
+in a simple and language independent manner. 
 
 The [specification](http://XMLrpc.scripting.com/spec.html) has been around since 1999.
-Recently developed servers will probably offer remote procedure calls based in more modern
+Recently developed servers will probably offer remote procedure calls based on more modern
 technology, for example [gRPC](https://grpc.io/).
 However it's very possible you will still need to write or support an XML-RPC client
-to access an existing server.
-Here are at [PaperCut](https://papercut.com) we are embracing newer
+to access an existing service.
+Here at [PaperCut](https://papercut.com) we are embracing newer
 network RPC protocols, but we still support a number of legacy APIs that use XML-RPC.
 
 I hope these notes will be useful enough to get you started if you have never used XML-RPC before.
-Of particular interest to XML-RPC novices will be using curl to see the raw XML
+Of particular interest to XML-RPC novices will be using `curl` to see the raw XML
 in the function calls, and the troubleshooting tips at the end.
 
 I'd love to get your feedback, especially if you notice something that needs
 fixing. Please leave a comment below.
 
-The XML-RPC model is very simple -- you make a call and you wait to get a single response.
+The XML-RPC model is very simple: you make a call and you wait to get a single response.
 There is no asynchronous model, no streaming and no security.
 Note that some XML-RPC libraries extend this model,
 but we don't discuss them further.
@@ -37,25 +38,26 @@ That question is best answered by reading the specification. But the short answe
 
 1. The client sends an XML document, using an HTTP(S) POST request, to the server.
 <!-- end of list -->
-
-4. HTTP status and an XML payload containing return values *OR*
-5. HTTP status and a fault, also delivered in an XML document. 
+2. HTTP status and an XML payload containing return values  
+<!-- end of list -->
+**OR**  
+3. HTTP status and a fault, also delivered in an XML document. 
 <!-- end of list -->
 
-The XML schema used is simple -- refer to the specification for details.
+The XML schema used is simple, for details refer to the specification.
 
 # What does this look like?
 
 The easiest way to understand this is to send XML-RPC requests using `curl`
 on the command line.
-You can then see the response details,
-which are often hidden when you program using
+You can then see the response details.
+These details are often hidden when you program using
 nice helpful libraries that handle the low level specifics.
 
 If you are using Linux or macOS then you probably already have curl installed,
 otherwise you will need to [install](https://curl.haxx.se/download.html) it for yourself.
 
-If you want to follow on with these examples the code is on
+If you want to follow on with these examples you can fine the code on
 [GitHub](https://github.com/PaperCutSoftware/howto-xmlrpc-clients)
 
 In order to make these examples concrete,
@@ -88,7 +90,7 @@ m4_syscmd(curl --stderr - -sv http://localhost:8080/users --data @xml/simpleExam
 ```
 
 Notice that this simple example is actually not that simple. The `getUserAllDetails()`
-returns a struct that contains different types (strings and a boolean).
+returns a struct that contains different data types (strings and a boolean).
 
 So now you can start to experiment and see whats happens when you get the URL wrong
 (the HTTP status changes), when you send ill formed XML and when you try and call method
@@ -120,7 +122,7 @@ I recommend you experiment further with this technique both as learning _and_ a
 debugging tool.
 
 I have also included a sample XML payload that shows what happens when you call
-a method with the wrong paramters.
+a method with the wrong parameters.
 
 # Using a real programming language.
 
@@ -130,13 +132,16 @@ So what tools do you need?
 
 1. Your favourite programming language:
 The good news is that you have lots of choices because XML-RPC is language agnostic.
-The rest if this post will use Python3 to illustrate the concepts,
+The rest of this post will use Python3 to illustrate the concepts,
 but I have provided some equivalent examples in
 [Java](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/java) and
 [Go](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/go).
 2. An XML-RPC specific library that handles all of the hard work around method names, arguments and responses from the server.
 There are sometimes multiple options for a specific environment so you may need to do some investigation to see what works best
 for you.
+
+Note that if you don't have access to an XML-RPC library then you will need
+to write your own module written on on top of an HTTPS client libraries.
 
 Here is a list of the libraries that we have used here at PaperCut.
 
@@ -154,7 +159,7 @@ You can find other suggestions on the XML-RPC
 
 I'll use the same Python server and create a Python client using the `xmlrpc.client` library.
 
-Please note that all this examples are very simplistic and are designed to 
+Please note that all these examples are very simplistic and are designed to 
 illustrate the basic process of making XML-RPC calls and handling the responses.
 
 In production code you will probably want to provide an application wrapper to map
@@ -181,7 +186,7 @@ m4_esyscmd([[sed -ne '/import xmlrpc.client/,/proxy/p' python3/simpleExample1.py
 ```
 
 Now we have a proxy object "connected" to the correct URL. But remember nothing
-has happened on the network yet, we've just set up a data structure.
+has happened on the network yet. We have only set up a data structure.
 
 Let's actually try and make a procedure call across the network:
 
@@ -208,7 +213,7 @@ and when we run it we get the following output
 m4_esyscmd([[python3/simpleExample1.py]])
 ```
 
-By contrast if we get the user name wrong for instance we get an exception.
+By contrast if we get the user name wrong we get an exception.
 
 ```
 m4_esyscmd([[sed -e 's/alec/anotherUser/' python3/simpleExample1.py|python3|fold -w 60]])
@@ -235,11 +240,11 @@ Additional security options include:
 2. [JWT](https://jwt.io/)
 3. Shared secret, provided via an additional method parameter. This is the approach
 used by PaperCut as it is easy for client developers to use.
-4. username/password authentication. This can also be used with JWT or shared secret.
+4. Username and password authentication. This can also be used with JWT or shared secret.
 
 # Troubleshooting
 
-So the Python client `simpleExampleWithErrors1.py` shows examples of a number of problems you can experience.
+The Python client `simpleExampleWithErrors1.py` shows examples of a number of problems you can experience.
 The way that the error is reported back to your client will depend the server and
 the XML-RPC library you use.
 
@@ -248,7 +253,7 @@ Things to check are:
 1. Are you using the correct URL endpoint?
 2. Is the server running?
 3. Is there a firewall or something else blocking network connections?
-4. Does the server code have some additional security requirement you have not satisfied? (e.g. passing additional security parameters)
+4. Does the server code have some additional security requirement that you have not satisfied? (e.g. passing additional security parameters)
 5. Are you using the correct method name?
 6. Do you have the correct number of parameters?
 7. Is each parameter of the correct type?
@@ -263,11 +268,11 @@ with a type mismatch.
 ## Low level debugging
 
 If you have checked all the above then I find the most productive approach
-is to use curl to send the XML request I _think_ my code is sending.
-This is the approach as I showed at the start of the post and
+is to use curl to send the XML request that you _think_ the code is sending.
+This is the approach demonstrated at at the start of the post and
 I used this technique to debug some problems with the test server
 I wrote for this article.
 
-If it succeeds then there is a bug in my client and if the call fails
-then I've made an incorrect assumption about how the server works.
+If it succeeds then there is a bug in the client and if the call fails
+then an incorrect assumption has been made about how the server works.
 

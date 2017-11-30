@@ -2,10 +2,10 @@
 //
 // Adapted from example on https://ws.apache.org/xmlrpc/client.html
 
+import java.net.URL;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.apache.xmlrpc.XmlRpcException;
-import java.net.URL;
 import java.net.MalformedURLException;
 
 
@@ -23,7 +23,12 @@ public class SimpleExample1 {
     public static void main(String[] args) throws MalformedURLException {
 
         config = new XmlRpcClientConfigImpl();
+        try {
         config.setServerURL(new URL(urlEndPoint));
+        } catch (MalformedURLException ex) {
+          System.out.println("Caught MalformedURL Exception " + ex.getCause());
+        }
+
 
         proxy= new XmlRpcClient();
         proxy.setConfig(config);
@@ -35,6 +40,8 @@ public class SimpleExample1 {
         } catch (XmlRpcException ex) {
 
           System.out.println("Caught XML RPC Exception " + ex.getMessage());
+        } catch (Exception ex) {
+          System.out.println("Unhandled Exception " + ex.getMessage());
         }
     }
 }

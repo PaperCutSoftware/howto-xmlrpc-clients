@@ -25,7 +25,11 @@ public class SimpleExampleWithErrors1 {
     public static void main(String[] args) throws MalformedURLException {
 
         config = new XmlRpcClientConfigImpl();
+        try {
         config.setServerURL(new URL(wrongUrlEndPoint));
+        } catch (MalformedURLException ex) {
+          System.out.println("Caught MalformedURL Exception " + ex.getCause());
+        }
 
         proxy= new XmlRpcClient();
         proxy.setConfig(config);
@@ -36,7 +40,9 @@ public class SimpleExampleWithErrors1 {
           System.out.println("Called userExistss for user " + testUser + ": Result is  " + res);
         } catch (XmlRpcException ex) {
 
-          System.out.println("Caught XML RPC Exception " + ex.getMessage());
+          System.out.println("Caught XML RPC Exception " + ex.getCause());
+        } catch (Exception ex) {
+          System.out.println("Unhandled Exception " + ex.getMessage());
         }
 
         config.setServerURL(new URL(urlEndPoint));
@@ -50,6 +56,8 @@ public class SimpleExampleWithErrors1 {
         } catch (XmlRpcException ex) {
 
           System.out.println("Caught XML RPC Exception " + ex.getMessage());
+        } catch (Exception ex) {
+          System.out.println("Unhandled Exception " + ex.getMessage());
         }
 
 
@@ -62,7 +70,10 @@ public class SimpleExampleWithErrors1 {
             System.out.println("Called userExistss for user " + name + ": Result is  " + res);
           } catch (XmlRpcException ex) {
 
-            System.out.println("Caught XML RPC Exception " + ex.getMessage());
+            System.out.println("Caught XML RPC Exception " + ex.getCause());
+          } catch (Exception ex) {
+
+            System.out.println("Unhandled Exception " + ex.getMessage());
           }
 
         }
