@@ -1,9 +1,11 @@
 .SUFFIXES:
 
-.PHONY: clean all tests tests-c tests-php tests-xml tests-python tests-java tests-go wc pdf html plain pmd
+TESTS:="tests-c tests-php tests-xml tests-python tests-java tests-go"
+
+.PHONY: clean all tests wc pdf html plain pmd $(TESTS) tests-all
 
 # Clean up old server instances
-KILLSERVER:=ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/sh"}'
+${shell ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/sh"}'}
 
 PROJECT:=BlogPost
 
@@ -27,7 +29,6 @@ clean:
 	@-rm -vf $(PROJECT).{pdf,html,pmd,docx} diagram.png
 
 %.pmd: %.m4 server/server.py ${glob xml/*.xml} python3/simpleExample1.py $(THISMAKEFILE)
-	$(KILLSERVER)
 	server/server.py & \
 	m4 -P $< > $@ ; \
 	kill %1
@@ -50,22 +51,18 @@ wc: $(PROJECT).pmd
 %.html: %.pmd $(IMAGES) $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) $< -o $@
 
-tests: tests-xml tests-python tests-java tests-go tests-c tests-php
+tests-all: $(TESTS)
 
 tests-xml:
-	$(KILLSERVER)
 	server/server.py & find xml -name \*.xml -ls -exec curl -v http://localhost:8080/users --data @{} \; ; kill %1
 
 tests-python:
-	$(KILLSERVER)
 	server/server.py & find python3 -name \*.py -ls -exec {} \; ; kill %1
 
 tests-java:
-	$(KILLSERVER)
 	server/server.py & cd java && for i in *.build.gradle ; do ./gradlew -b $$i run;done; kill %1
 
 tests-go:
-	$(KILLSERVER)
 	go get github.com/divan/gorilla-xmlrpc/xml
 	server/server.py & find go -name \*.go -ls -exec go run {} \; ;kill %1
 

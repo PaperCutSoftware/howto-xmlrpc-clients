@@ -154,6 +154,12 @@ Here is a list of the libraries that we have used here at PaperCut.
 | Python2 | xmlrpclib|
 | Perl    | RPC::XML::Client|
 
+If you are using C then currently the best option is [xmlrpc-c](http://xmlrpc-c.sourceforge.net/)
+and you can find an example program [here](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/C)
+I also created a small PHP 7
+[example](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/php/simpleExample1.php)
+which uses the xml encode/decode functions.
+
 You can find other suggestions on the XML-RPC
 [website](http://www.xmlrpc.com/directory/1568/implementations).
 

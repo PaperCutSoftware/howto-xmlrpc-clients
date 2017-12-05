@@ -1,3 +1,8 @@
+// Adapted from
+// https://sourceforge.net/p/xmlrpc-c/code/HEAD/tree/trunk/examples/xmlrpc_sample_add_client.c
+//
+
+
 #include <stdlib.h>
 #include <xmlrpc-c/base.h>
 #include <xmlrpc-c/client.h>
@@ -45,7 +50,7 @@ main(int           const argc,
                 "(s)", testUser );
     die_if_fault_occurred(&env);
     
-    /* Get our sum and print it out. */
+    /* Get our result and print it out. */
     xmlrpc_read_bool(&env, resultP, &found);
     die_if_fault_occurred(&env);
     printf("The user %s %s\n", testUser, found? "exists": "does not exist");
