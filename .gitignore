@@ -7,3 +7,5 @@ java/build/
 java/.gradle/
 *.pyc
 diagram.png
+C/config.h
+C/simpleExample1

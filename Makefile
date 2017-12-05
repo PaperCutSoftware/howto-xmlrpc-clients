@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-.PHONY: clean all tests tests-xml tests-python tests-java tests-go wc pdf html plain pmd
+.PHONY: clean all tests tests-c tests-php tests-xml tests-python tests-java tests-go wc pdf html plain pmd
 
 # Clean up old server instances
 KILLSERVER:=ps -u $(USER) | awk '/python.+server\.py/ {print "kill " $$2|"/bin/sh"}'
@@ -50,7 +50,7 @@ wc: $(PROJECT).pmd
 %.html: %.pmd $(IMAGES) $(THISMAKEFILE)
 	pandoc $(PANDOC_FLAGS) $< -o $@
 
-tests: tests-xml tests-python tests-java tests-go
+tests: tests-xml tests-python tests-java tests-go tests-c tests-php
 
 tests-xml:
 	$(KILLSERVER)
@@ -68,4 +68,13 @@ tests-go:
 	$(KILLSERVER)
 	go get github.com/divan/gorilla-xmlrpc/xml
 	server/server.py & find go -name \*.go -ls -exec go run {} \; ;kill %1
+
+tests-php:
+	server/server.py & php/simpleExample1.php ;kill %1
+
+tests-c:
+	cd C; $(MAKE)
+
+
+
 
