@@ -132,7 +132,7 @@ So what tools do you need?
 
 1. Your favourite programming language:
 The good news is that you have lots of choices because XML-RPC is language agnostic.
-The rest of this post will use Python3 to illustrate the concepts,
+The rest of this post will use Python 3 to illustrate the concepts,
 but I have provided some equivalent examples in
 [Java](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/java) and
 [Go](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/go).
@@ -150,12 +150,12 @@ Here is a list of the libraries that we have used here at PaperCut.
 | Java    | org.apache.xmlrpc|
 | Go      | gorilla-xmlrpc |
 | .NET    | Cook Computing XML-RPC.NET|
-| Python3 | xmlrpc.client| 
-| Python2 | xmlrpclib|
+| Python 3| xmlrpc.client| 
+| Python 2| xmlrpclib|
 | Perl    | RPC::XML::Client|
 
 If you are using C then currently the best option is [xmlrpc-c](http://xmlrpc-c.sourceforge.net/)
-and you can find an example program [here](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/C)
+and you can find an example program [here](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/tree/master/C).
 I also created a small PHP 7
 [example](https://github.com/PaperCutSoftware/howto-xmlrpc-clients/blob/master/php/simpleExample1.php)
 which uses the xml encode/decode functions.
