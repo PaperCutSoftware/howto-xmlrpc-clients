@@ -69,5 +69,6 @@ if __name__ == "__main__":
         server.register_function(getAllUsersByStatus)
 
         # Run the server's main loop
+        print( "Starting API server on 8080")
         server.serve_forever()
 
