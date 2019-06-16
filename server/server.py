@@ -58,7 +58,7 @@ if __name__ == "__main__":
         rpc_paths = ('/users',)
 
     # Create server
-    with SimpleXMLRPCServer(("localhost", 8080),
+    with SimpleXMLRPCServer(("localhost", 9089),
                 requestHandler=RequestHandler) as server:
 
         server.register_introspection_functions()

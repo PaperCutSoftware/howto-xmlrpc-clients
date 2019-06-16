@@ -2,7 +2,7 @@
 
 import xmlrpc.client
 
-host = "localhost"
+host = "0.0.0.0"
 port = "8080"
 urlEndPoint="http://"+host+":"+port+"/users"
 
